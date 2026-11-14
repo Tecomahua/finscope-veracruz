@@ -1,4 +1,6 @@
-# FinScope México
+# FinScope México — análisis municipal reproducible
+
+Este repositorio documenta el análisis inicial del **municipio de Veracruz**. El [caso de FinScope México](https://tecomahua.github.io/javier-martinez-portfolio/proyectos/finscope-mexico/) presenta un tablero separado de alcance nacional; sus datos y código no están contenidos en este repositorio.
 
 [![Tests](https://github.com/Tecomahua/finscope-veracruz/actions/workflows/tests.yml/badge.svg)](https://github.com/Tecomahua/finscope-veracruz/actions/workflows/tests.yml)
 
