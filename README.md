@@ -1,5 +1,7 @@
 # FinScope Veracruz
 
+[![Tests](https://github.com/Tecomahua/finscope-veracruz/actions/workflows/tests.yml/badge.svg)](https://github.com/Tecomahua/finscope-veracruz/actions/workflows/tests.yml)
+
 Proyecto reproducible de análisis exploratorio de infraestructura financiera en el municipio de Veracruz, Veracruz (INEGI **30193**); excluye Boca del Río (30028). Combina registros municipales de CNBV y agregados del DENUE de INEGI. Es un proyecto de portafolio, no una medición directa de la inclusión financiera de las personas.
 
 ## Resultados verificables
@@ -37,8 +39,8 @@ Para el cuaderno, crear un entorno virtual e instalar `pip install -r requiremen
 - `sql/`: esquema, carga idempotente, vista de tasas y consultas.
 - `src/dashboard.py` y `dashboard.html`: tablero local interactivo sin dependencias web externas.
 - `notebooks/`: análisis con pandas; `tests/`: controles de claves, tasas y respuesta HTTP.
-- [Metodología y límites](docs/metodologia.md) · [Fuentes y verificaciones](docs/estado.md).
+- [Caso de estudio y hallazgos](docs/caso-de-estudio.md) · [Diccionario](docs/diccionario.md) · [Metodología y límites](docs/metodologia.md) · [Fuentes y verificaciones](docs/estado.md).
 
 ## Límites
 
-La disponibilidad de infraestructura no demuestra uso ni accesibilidad efectiva; una mayor o menor concentración no identifica por sí sola demanda insatisfecha. CNBV agrega distintos tipos de institución, y DENUE tiene cobertura, clasificación y fecha distintas. Los conteos por localidad no incorporan población local ni tiempos de viaje y no permiten clasificar colonias como desatendidas. La serie y denominadores pueden reflejar revisiones o cambios metodológicos; interpretar saltos con cautela. No se dispone aquí de microdatos de uso, límites geográficos ni tasas por colonia.
+La disponibilidad de infraestructura no demuestra uso ni accesibilidad efectiva; una mayor o menor concentración no identifica por sí sola demanda insatisfecha. CNBV agrega distintos tipos de institución, y DENUE tiene cobertura, clasificación y fecha distintas. Los conteos por localidad no incorporan población local ni tiempos de viaje y no permiten clasificar colonias como desatendidas. La serie y denominadores pueden reflejar revisiones o cambios metodológicos; interpretar saltos con cautela. No se dispone aquí de microdatos de uso, límites geográficos ni tasas por colonia. CNBV publicó un reporte nacional con datos al primer trimestre de 2026; esta versión no ha integrado una base municipal de ese periodo.
