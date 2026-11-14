@@ -1,4 +1,4 @@
-# FinScope Veracruz
+# FinScope México
 
 [![Tests](https://github.com/Tecomahua/finscope-veracruz/actions/workflows/tests.yml/badge.svg)](https://github.com/Tecomahua/finscope-veracruz/actions/workflows/tests.yml)
 
