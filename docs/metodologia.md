@@ -1,0 +1,7 @@
+# Metodología y limitaciones
+
+Unidad de análisis: municipio 30193. Boca del Río es 30028 y queda excluido. El dato disponible es población total, no adultos; por ello no puede utilizarse para construir indicadores por 10,000 adultos. El Censo 2020 no debe presentarse como población actual.
+
+La infraestructura es una medida de oferta potencial y no prueba que las personas utilicen servicios, tengan cuentas o puedan acceder a ellos. Los registros CNBV y DENUE miden universos distintos; no deben sumarse ni identificarse como equivalentes. Conteos municipales tampoco revelan desigualdad por colonia. Oportunidades de mejora serán hipótesis que requieren datos espaciales, denominadores y validación de campo; no se producen puntuaciones con la información actual.
+
+Para completar: 1) descargar archivos oficiales mediante conexiones TLS verificadas, conservar URL, fecha de descarga, hash SHA-256, fecha de corte y diccionario; 2) identificar clave y categorías según diccionario, filtrar exactamente 30193 y auditar exclusiones; 3) validar duplicados, nulos, unidades y fechas; 4) obtener población adulta y periodo compatibles, documentando cualquier desajuste; 5) cargar mediante transacciones idempotentes; 6) construir métricas y mapa solo cuando se hayan verificado cobertura, clasificación y periodo; 7) registrar procedencia y limitaciones. No se deben publicar datos personales ni secretos.
