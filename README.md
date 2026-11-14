@@ -1,32 +1,44 @@
 # FinScope Veracruz
 
-Prototipo de análisis de inclusión financiera para el municipio de Veracruz, Veracruz (clave geoestadística 30193). **Estado: incompleto; no hay indicadores financieros procesados.** El único dato incluido es la población total del Censo 2020, 607,209 habitantes. La cifra es transcrita de una publicación oficial de INEGI y no pretende representar población adulta ni actual.
+Proyecto reproducible de análisis exploratorio de infraestructura financiera en el municipio de Veracruz, Veracruz (INEGI **30193**); excluye Boca del Río (30028). Combina registros municipales de CNBV y agregados del DENUE de INEGI. Es un proyecto de portafolio, no una medición directa de la inclusión financiera de las personas.
 
-## Qué funciona
+## Resultados verificables
 
-- Una visualización local sin dependencias externas presenta el dato censal y el estado de las fuentes.
-- `src/verificar_censo.py` descarga el informe de INEGI mediante TLS, verifica su SHA-256 y comprueba el contexto de la cifra con `pdftotext` (Poppler).
-- Ejemplo de consultas y esquema PostgreSQL con restricciones de municipio.
-- Cuaderno pandas que examina la única observación verificable.
-- Pruebas automáticas de integridad y respuestas del servidor local.
+En el archivo CNBV utilizado, el corte más reciente **dentro del archivo** es diciembre de 2025: 82 sucursales, 469 corresponsales, 426 cajeros y 4,913 terminales punto de venta. Su denominador reportado es 508,471 adultos; las tasas respectivas son 1.61, 9.22, 8.38 y 96.62 por cada 10,000 adultos. Las 82 sucursales incluyen los sectores que CNBV integra en `Total_sucursales`.
+
+La serie del archivo contiene 24 trimestres entre marzo de 2020 y diciembre de 2025. DENUE, con corte mayo de 2026, contiene **224 establecimientos** del subsector SCIAN 522 en el municipio, de ellos 82 clasificados como banca múltiple. Sus universos y fechas son diferentes de CNBV y **no se deben sumar ni equiparar**. Los archivos procesados solo incluyen valores agregados y nunca nombres, direcciones, teléfonos ni correos de establecimientos.
 
 ## Ejecutar
 
-Requiere Python 3.10 o posterior. Desde la carpeta del proyecto:
+Requisitos: Python 3.11 o 3.12, conexión a Internet para descargar las fuentes; PostgreSQL 15+ para la base; Poppler para verificar el PDF censal. El tablero funciona con la biblioteca estándar de Python:
 
 ```sh
+python3 src/pipeline.py --download
 python3 -m unittest discover -s tests -v
 python3 src/dashboard.py
 ```
 
-Abrir http://127.0.0.1:8050. Para el cuaderno: crear un entorno virtual, instalar `pip install -r requirements.txt` y ejecutar Jupyter. Para PostgreSQL 15+, ejecutar `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f sql/schema.sql`, después `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f sql/analysis.sql`. Se requiere una base existente y permisos de creación. El esquema incluye únicamente la población documentada; no contiene información financiera. El esquema y la consulta fueron ejecutados con PostgreSQL 16.15. Para verificar la fuente de nuevo, con Internet y Poppler instalado: `python3 src/verificar_censo.py`.
+Abrir http://127.0.0.1:8050. La descarga puede tardar; los archivos brutos se guardan en `data/raw/` (ignorado por Git). Se verifican SHA-256 fijados: si una fuente cambia, el proceso se detiene para revisión y no reemplaza silenciosamente la versión. Para reproducir una versión nueva, examinar su contenido, metadatos, diccionario y actualizar huellas conscientemente.
 
-## Fuentes y pendientes
+Para cargar PostgreSQL, crear una base y ejecutar desde la raíz (la segunda carga reemplaza los agregados en una transacción):
 
-INEGI: [México en cifras, Veracruz 30193](https://www.inegi.org.mx/app/areasgeograficas/?ag=30193) y [resultados censales 2020, página 6](https://inegi.org.mx/contenidos/productos/prod_serv/contenidos/espanol/bvinegi/productos/nueva_estruc/702825198367.pdf). Corte censal: 2020. Transcripción verificada el 13 de noviembre de 2026; SHA-256 del PDF: `f1b1894514515611afb2f60a76352a075f02649151f4c04b572b80790b417adb`.
+```sh
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f sql/schema.sql
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f sql/load.sql
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f sql/analysis.sql
+```
 
-[CNBV: bases de inclusión financiera](https://www.cnbv.gob.mx/Inclusi%C3%B3n/Paginas/Bases-de-Datos.aspx) y [catálogo de archivos](https://datosabiertos.cnbv.gob.mx/_layouts/mobile/view.aspx?List=668bc47c-4276-41c9-83e1-d1f8b03e88b3&RootFolder=%2FDocumentos%2FServiciosFinancieros&View=b1605cdd-db7d-48b2-820d-037051802fbc). [INEGI DENUE](https://www.inegi.org.mx/app/mapa/denue/Default.aspx) y [descarga masiva](https://inegi.org.mx/app/descarga/?p=792). Son fuentes identificadas, **no descargadas ni integradas**. El nombre de un archivo CNBV no demuestra el periodo de sus observaciones: hay que inspeccionar datos y diccionario.
+Para el cuaderno, crear un entorno virtual e instalar `pip install -r requirements.txt`; ejecutar `jupyter lab` y abrir `notebooks/01_analisis.ipynb`. El verificador opcional `python3 src/verificar_censo.py` descarga el informe censal y verifica su huella y texto.
 
-La descarga CNBV desde el entorno falló por validación del certificado TLS. Faltan: descarga y validación de esquemas, limpieza real CNBV y DENUE, datos de población adulta compatibles con el periodo, carga de datos financieros a PostgreSQL, métricas de acceso, series y mapa. No se calculan tasas financieras ni se identifican zonas prioritarias. Ver [metodología](docs/metodologia.md) y [estado](docs/estado.md).
+## Contenido
 
-No se incluyen nombres, direcciones ni coordenadas de establecimientos ni credenciales. No cargar datos personales o tokens al repositorio.
+- `src/pipeline.py`: descarga HTTPS, validación de huellas, extracción selectiva de CNBV y agregación DENUE.
+- `data/processed/`: serie CNBV, agregados DENUE y datos para el tablero.
+- `sql/`: esquema, carga idempotente, vista de tasas y consultas.
+- `src/dashboard.py` y `dashboard.html`: tablero local interactivo sin dependencias web externas.
+- `notebooks/`: análisis con pandas; `tests/`: controles de claves, tasas y respuesta HTTP.
+- [Metodología y límites](docs/metodologia.md) · [Fuentes y verificaciones](docs/estado.md).
+
+## Límites
+
+La disponibilidad de infraestructura no demuestra uso ni accesibilidad efectiva; una mayor o menor concentración no identifica por sí sola demanda insatisfecha. CNBV agrega distintos tipos de institución, y DENUE tiene cobertura, clasificación y fecha distintas. Los conteos por localidad no incorporan población local ni tiempos de viaje y no permiten clasificar colonias como desatendidas. La serie y denominadores pueden reflejar revisiones o cambios metodológicos; interpretar saltos con cautela. No se dispone aquí de microdatos de uso, límites geográficos ni tasas por colonia.

@@ -1,7 +1,19 @@
-# Metodología y limitaciones
+# Metodología
 
-Unidad de análisis: municipio 30193. Boca del Río es 30028 y queda excluido. El dato disponible es población total, no adultos; por ello no puede utilizarse para construir indicadores por 10,000 adultos. El Censo 2020 no debe presentarse como población actual.
+## Alcance y fuentes
 
-La infraestructura es una medida de oferta potencial y no prueba que las personas utilicen servicios, tengan cuentas o puedan acceder a ellos. Los registros CNBV y DENUE miden universos distintos; no deben sumarse ni identificarse como equivalentes. Conteos municipales tampoco revelan desigualdad por colonia. Oportunidades de mejora serán hipótesis que requieren datos espaciales, denominadores y validación de campo; no se producen puntuaciones con la información actual.
+La unidad de análisis es el municipio INEGI 30193; se filtra `Clave_Municipio` en CNBV y `cve_ent=30`, `cve_mun=193` en DENUE. No se usa la zona metropolitana ni Boca del Río (30028). CNBV ofrece indicadores de infraestructura reportados por entidades reguladas. Se toma la serie 2020–2025 del archivo fijado. Cada trimestre se identifica por el año del archivo anual y el mes del archivo trimestral; cuando existe `Clave_Periodo`, se contrasta. Se requiere una sola fila municipal por periodo y 24 trimestres únicos.
 
-Para completar: 1) descargar archivos oficiales mediante conexiones TLS verificadas, conservar URL, fecha de descarga, hash SHA-256, fecha de corte y diccionario; 2) identificar clave y categorías según diccionario, filtrar exactamente 30193 y auditar exclusiones; 3) validar duplicados, nulos, unidades y fechas; 4) obtener población adulta y periodo compatibles, documentando cualquier desajuste; 5) cargar mediante transacciones idempotentes; 6) construir métricas y mapa solo cuando se hayan verificado cobertura, clasificación y periodo; 7) registrar procedencia y limitaciones. No se deben publicar datos personales ni secretos.
+DENUE es un directorio de unidades económicas; se selecciona el subsector SCIAN 522 y se agregan conteos por clase de actividad y clave de localidad. Se leen pero no se escriben datos de identificación o contacto de establecimientos. El ZIP nacional por estado permanece fuera de Git. Pueden existir registros con distintas fechas individuales de alta: el corte es la edición 05/2026, no una fecha de visita verificada.
+
+## Tasas y lectura
+
+Para cada trimestre: conteo de infraestructura / `Poblacion_adulta` reportada en la misma fila CNBV × 10,000. No sustituimos este denominador por el total del Censo 2020. El censo proporciona contexto independiente: 607,209 habitantes totales en 2020. Las tasas se redondean a dos decimales. El denominador adulto cambia entre años, por lo que no toda variación en tasas representa variación en conteos. Los reportes pueden revisarse y las definiciones de CNBV cambiar; examinar el diccionario y las notas oficiales antes de afirmar tendencias causales o comparar periodos.
+
+## Oportunidades de investigación
+
+Los agregados por localidad pueden orientar preguntas para trabajo de campo: verificar cobertura real, condiciones de atención, demanda, accesibilidad y conectividad. No hay población o geometrías por localidad incorporadas, así que no se clasifican zonas desatendidas ni se construye un índice de oportunidad. La serie de infraestructura tampoco indica tenencia o uso de productos.
+
+## Diferencias entre fuentes
+
+Sucursales CNBV comprenden banca comercial y de desarrollo, cooperativas y microfinancieras del universo reportado; DENUE clasifica unidades económicas por actividad y no es un censo de todos los cajeros o corresponsales. La igualdad numérica de dos conteos de 82 en diferentes fuentes/cortes es coincidencia y no evidencia equivalencia. Los datos de 2025 y 2026 no son simultáneos. Cada fuente tiene cobertura, actualizaciones y posibles errores propios.
